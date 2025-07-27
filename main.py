@@ -3,14 +3,17 @@ from fastapi.responses import JSONResponse
 
 app = FastAPI()
 
-app = FastAPI(
-    title="CV Extraction Pipeline",
-    version="0.1.0",
-    docs_url="/docs",
-    redoc_url="/redoc",
-)
+@app.on_event("startup")
+async def list_routes():
+    print("Available routes:")
+    for route in app.router.routes:
+        print(route.path, route.methods)
 
-app.post("/upload/")
+@app.get("/")
+async def root():
+    return {"status": "ok"}
+
+app.post("/upload")
 async def upload_cv(file: UploadFile = File(...)):
      return JSONResponse({
         "filename": file.filename,
