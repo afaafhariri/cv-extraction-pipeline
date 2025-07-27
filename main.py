@@ -28,6 +28,9 @@ async def upload_cv(file: UploadFile = File(...)):
     contents = await file.read()
     with open(file_location, "wb") as f:
         f.write(contents)
+        print("File uploaded successfully")
+        print(f"File saved to {file_location}")
+        print(f"File name: {file.filename}")
     return JSONResponse({
         "filename": file.filename,
         "content_type": file.content_type,
