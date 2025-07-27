@@ -10,3 +10,9 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
+app.post("/upload/")
+async def upload_cv(file: UploadFile = File(...)):
+     return JSONResponse({
+        "filename": file.filename,
+        "content_type": file.content_type
+    })
