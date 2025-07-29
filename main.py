@@ -1,6 +1,7 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
 import os
+from google.cloud import storage
 
 app = FastAPI()
 
