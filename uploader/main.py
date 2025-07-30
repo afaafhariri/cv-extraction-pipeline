@@ -59,7 +59,6 @@ async def upload_cv(
     file: UploadFile = File(...),
     user: dict = Depends(get_current_user),
 ):
-    # 1) Upload file to GCS
     contents = await file.read()
     blob = bucket.blob(file.filename)
     try:
@@ -67,7 +66,6 @@ async def upload_cv(
     except Exception as e:
         raise HTTPException(500, f"GCS upload error: {e}")
 
-    # 2) Publish event
     msg = json.dumps({
         "bucket": bucket_name,
         "filename": file.filename,
