@@ -8,6 +8,15 @@ from google.cloud import storage, pubsub_v1
 load_dotenv()
 app = FastAPI()
 
+bucket_name = os.getenv("GCS_BUCKET_NAME")
+storage_client = storage.Client()
+bucket = storage_client.bucket(bucket_name)
+
+publisher = pubsub_v1.PublisherClient()
+topic_path = publisher.topic_path(
+    storage_client.project, os.getenv("PUBSUB_TOPIC")
+)
+
 @app.get("/")
 async def root():
     return {"status": "ok"}
