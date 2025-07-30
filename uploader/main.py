@@ -26,6 +26,7 @@ def get_current_user(request: Request):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
     return user
+
 bucket_name = os.getenv("GCS_BUCKET_NAME")
 storage_client = storage.Client()
 bucket = storage_client.bucket(bucket_name)
