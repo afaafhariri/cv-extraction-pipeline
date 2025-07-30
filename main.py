@@ -1,8 +1,11 @@
-from fastapi import FastAPI, File, UploadFile
+from dotenv import load_dotenv
+from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
 import os
-from google.cloud import storage
+from google.cloud import storage, pubsub_v1
 
+
+load_dotenv()
 app = FastAPI()
 
 @app.get("/")
