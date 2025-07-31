@@ -5,6 +5,7 @@ import tempfile
 import uuid
 from datetime import datetime
 import boto3
+from botocore.exceptions import ClientError
 from google.cloud import storage
 from motor.motor_asyncio import AsyncIOMotorClient
 import pdfplumber
