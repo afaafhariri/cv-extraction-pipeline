@@ -105,11 +105,7 @@ def process_cv(event, context):
         send_confirmation(info["email"], info.get("name", "Applicant"), app_id)
 
 
-# # processor/main.py
-
-# # ─── Cloud Function Entry Point ──────────────────────────────────────────────
-
-# def process_cv(event, context):
+# def process_cv(event, context): alternate version
 #     """
 #     Triggered by Pub/Sub on CV upload.
 #     Downloads the file, parses it, stores to MongoDB, and emails via SES.
