@@ -45,15 +45,37 @@ def extract_contact_info(path: str):
     name = (NAME.search(text).group(0) if NAME.search(text) else None)
     return {"name": name, "email": email, "phone": phone}
 
-
 def send_confirmation(email: str, name: str, app_id: str):
-    message = Mail(
-        from_email=os.getenv("FROM_EMAIL"),
-        to_emails=email,
-        subject="Your Application Received",
-        html_content=f"Hi {name},<br>Your application ID is <strong>{app_id}</strong>."
-    )
-    sg.send(message)
+    SENDER = os.getenv("FROM_EMAIL")
+    RECEIVER = email
+    SUBJECT = "Your Application Received"
+    CHARSET = "UTF-8"
+    BODY_TEXT = f"Hi {name},\nYour application ID is {app_id}."
+    BODY_HTML = f"""
+    <html>
+      <body>
+        <p>Hi {name},</p>
+        <p>Your application ID is <strong>{app_id}</strong>.</p>
+      </body>
+    </html>
+    """
+    try:
+        response = ses.send_email(
+            Source=SENDER,
+            Destination={"ToAddresses": [RECEIVER]},
+            Message={
+                "Subject": {"Data": SUBJECT, "Charset": CHARSET},
+                "Body": {
+                    "Text": {"Data": BODY_TEXT, "Charset": CHARSET},
+                    "Html": {"Data": BODY_HTML, "Charset": CHARSET},
+                },
+            },
+        )
+    except ClientError as e:
+        print(f"SES send_email error: {e.response['Error']['Message']}")
+    else:
+        print(f"SES email sent, Message ID: {response['MessageId']}")
+
 
 def process_cv(event, context):
     payload = json.loads(base64.b64decode(event['data']).decode("utf-8"))
@@ -84,81 +106,6 @@ def process_cv(event, context):
 
 
 # # processor/main.py
-
-# import os
-# import json
-# import base64
-# import tempfile
-# import uuid
-# from datetime import datetime
-
-# import boto3
-# from botocore.exceptions import ClientError
-# from google.cloud import storage
-# from motor.motor_asyncio import AsyncIOMotorClient
-# import pdfplumber
-# import docx
-# import phonenumbers
-# from dotenv import load_dotenv
-
-# load_dotenv()
-
-# # ─── Clients ──────────────────────────────────────────────────────────────────
-
-# # Google Cloud Storage
-# gcs = storage.Client()
-
-# # MongoDB Atlas
-# mongo = AsyncIOMotorClient(os.getenv("MONGODB_URI"))
-# db = mongo.get_default_database()
-
-# # AWS SES
-# ses = boto3.client(
-#     "ses",
-#     aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-#     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-#     region_name=os.getenv("AWS_REGION")
-# )
-
-
-# def send_confirmation(email: str, name: str, app_id: str):
-#     """
-#     Send a confirmation email via AWS SES.
-#     """
-#     SENDER = os.getenv("FROM_EMAIL")
-#     RECEIVER = email
-#     SUBJECT = "Your Application Received"
-#     CHARSET = "UTF-8"
-
-#     # Plain-text and HTML bodies
-#     BODY_TEXT = f"Hi {name},\nYour application ID is {app_id}."
-#     BODY_HTML = f"""
-#     <html>
-#       <body>
-#         <p>Hi {name},</p>
-#         <p>Your application ID is <strong>{app_id}</strong>.</p>
-#       </body>
-#     </html>
-#     """
-
-#     try:
-#         response = ses.send_email(
-#             Source=SENDER,
-#             Destination={"ToAddresses": [RECEIVER]},
-#             Message={
-#                 "Subject": {"Data": SUBJECT, "Charset": CHARSET},
-#                 "Body": {
-#                     "Text": {"Data": BODY_TEXT, "Charset": CHARSET},
-#                     "Html": {"Data": BODY_HTML, "Charset": CHARSET},
-#                 },
-#             },
-#         )
-#     except ClientError as e:
-#         # Log the error but don’t fail the whole function
-#         print(f"SES send_email error: {e.response['Error']['Message']}")
-#     else:
-#         print(f"SES email sent, Message ID: {response['MessageId']}")
-
 
 # # ─── Cloud Function Entry Point ──────────────────────────────────────────────
 
