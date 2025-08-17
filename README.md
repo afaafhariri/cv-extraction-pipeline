@@ -187,9 +187,3 @@ serverless deploy
 ## Contributing
 
 Contributions are welcome! Please open issues or pull requests for feature requests, bug fixes, or documentation improvements.
-
----
-
-## License
-
-[MIT](LICENSE)
