@@ -1,6 +1,6 @@
 # CV Extraction Pipeline
 
-An **event-driven** system built on AWS for extracting applicant information from CVs, authenticating uploads via Google OAuth, storing files in **AWS S3**, processing asynchronously via **AWS SNS & Lambda**, persisting parsed data in **MongoDB Atlas**, and sending confirmation emails through **AWS SES**.
+An **event-driven** system built on AWS for extracting applicant information from CVs, authenticating uploads via Google OAuth, storing files in **GCS**, processing asynchronously via **AWS SNS & Lambda**, persisting parsed data in **MongoDB Atlas**, and sending confirmation emails through **AWS SES**.
 
 ---
 
@@ -11,23 +11,23 @@ Client Browser
     ↓ (HTTPS + OAuth)
 API Gateway → Uploader Lambda
     ↓ (stores file)
-    → AWS S3 (CV Bucket)
-    ↓ (S3 Put Event or SNS)
+    → GCS (CV Bucket)
+    ↓ (GCS Put Event or SNS)
 SNS Topic → Processor Lambda
     → parses CV → MongoDB Atlas
     → sends email via AWS SES
 ```
 
-- **Uploader Lambda** (FastAPI + Mangum) handles Google OAuth login, receives CV uploads, writes to S3, and publishes a message to an SNS topic.
+- **Uploader Lambda** (FastAPI + Mangum) handles Google OAuth login, receives CV uploads, writes to GCS, and publishes a message to an SNS topic.
 - **Processor Lambda** triggers on SNS events (or S3 notifications), downloads the CV from S3, extracts name/email/phone, stores a document in MongoDB Atlas, and sends a confirmation email via SES.
 
 ---
 
 ## Technologies
 
-- **Uploader**: Python, FastAPI, Mangum, Authlib (Google OAuth), AWS S3, AWS SNS, AWS Lambda, API Gateway
-- **Processor**: Python, AWS Lambda, pdfplumber, python-docx, phonenumbers, Motor (MongoDB), Boto3 (AWS SES & S3)
-- **Storage**: AWS S3
+- **Uploader**: Python, FastAPI, Mangum, Authlib (Google OAuth), GCS, AWS SNS, AWS Lambda, API Gateway
+- **Processor**: Python, AWS Lambda, pdfplumber, python-docx, phonenumbers, Motor (MongoDB), Boto3 (AWS SES)
+- **Storage**: GCS
 - **Messaging**: AWS SNS
 - **Compute**: AWS Lambda behind API Gateway
 - **Database**: MongoDB Atlas
@@ -54,13 +54,13 @@ cv-pipeline/
 ## Prerequisites
 
 - **AWS Account** with:
-  - **IAM User/Role** granting permissions to S3, SNS, Lambda, and SES (`AmazonS3FullAccess`, `AmazonSNSFullAccess`, `AWSLambda_FullAccess`, `AmazonSESFullAccess`).
-  - **S3 Bucket** to store uploaded CVs.
+  - **IAM User/Role** granting permissions to SNS, Lambda, and SES (`AmazonS3FullAccess`, `AmazonSNSFullAccess`, `AWSLambda_FullAccess`, `AmazonSESFullAccess`).
   - **SNS Topic** for CV processing events.
   - **SES**: Verified sending identity (email or domain).
   - **API Gateway** and **Lambda** permissions.
 - **MongoDB Atlas** cluster URI.
 - **Google OAuth credentials**: Client ID & Client Secret for OAuth login.
+- **Google Cloud Storage**: File storage
 - **Python 3.9+**, `pip`, and **Git**.
 
 ---
